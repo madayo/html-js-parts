@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Datepicker - Default functionality</title>
+  <style>
+    /* 選択可能 */
+    a.ui-state-default:not(.ui-state-active){
+      background-color: #ffffff;
+    }
+    /* 選択不可 */
+    td.ui-datepicker-unselectable.ui-state-disabled {
+      opacity: 1;
+    }
+    td.ui-datepicker-unselectable.ui-state-disabled .ui-state-default {
+      background-color: #E6E6E6;
+    }
+    /* 日祝 */
+    td.holiday .ui-state-default {
+      background-color: #F6CECE!important;
+    }
+    /* ホバー時の動作 */
+    a.ui-state-default.ui-state-hover {
+      opacity: 0.5;
+    }
+
+    /* 当日 */
+    td.ui-datepicker-today span.ui-state-default {
+      background-color: #F2F5A9!important;
+    }
+
+  </style>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://jqueryui.com/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $("#datepicker").datepicker({
+      minDate: new Date('2019/08/15'),
+      maxDate: new Date('2019/10/10'),
+      beforeShowDay: function(date) {
+        var closeDays = [0, 6];
+        var holidays = ['2019-08-28', '2019-08-30'];
+        // 休業日
+        if (closeDays.indexOf(date.getDay()) >= 0) {
+          return [false, 'holiday'];
+        // 休業日以外は祝日配列と比較する
+        } else {
+          var formatDate = $.datepicker.formatDate("yy-mm-dd", date);
+          var isHoliday = holidays.indexOf(formatDate) >= 0;
+          return [!isHoliday, isHoliday ? 'holiday' : ''];
+        }
+      }
+    });
+    $("#datepicker").datepicker("setDate", new Date('2019/08/26'));
+  } );
+  </script>
+</head>
+<body>
+
+<p>Date: <input type="text" id="datepicker"></p>
+
+
+</body>
+</html>
+
