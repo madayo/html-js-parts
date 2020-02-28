@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <style>
+    body {
+      padding: 5px 15px;
+    }
+    .triangle1 {
+      width: 0;
+      border-top: solid 40px lightgray;
+      border-bottom: solid 40px lightgray;
+      border-left: solid 40px lightgray;
+      border-right: solid 40px lightgray;
+    }
+    .triangle2 {
+      width: 0;
+      border-top: solid 40px lightgray;
+      border-bottom: solid 40px lightcoral;
+      border-left: solid 40px lightskyblue;
+      border-right: solid 40px lightgreen;
+    }
+    .triangle3 {
+      width: 0;
+      border-top: solid 40px transparent;
+      border-bottom: solid 40px lightcoral;
+      border-left: solid 40px transparent;
+      border-right: solid 40px transparent;
+    }
+    .triangle4 {
+      width: 0;
+      border-top: solid 40px transparent;
+      border-bottom: solid 40px lightcoral;
+      border-left: solid 10px transparent;
+      border-right: solid 40px transparent;
+    }
+  </style>
+</head>
+<body>
+  <h1>三角形の作り方</h1>
+  <p>サイズ 0 の図形に border を適用して、各辺を表示・透過させることで三角形を作り出す</p>
+  <p>以下は 4 辺すべてに border を設定した場合</p>
+  <div class="triangle1"></div>
+  <p>今度は 4 辺すべてに異なる色の border を設定してみる。お互いが重なり合うことで対角線を引くような形で分割される</p>
+  <div class="triangle2"></div>
+  <p>1 辺だけ色を付けて、のこり 3 辺は透明にしてみると三角形が出来上がる</p>
+  <div class="triangle3"></div>
+  <p>4 辺の幅をそれぞれ変えると、歪んだ三角形にもできる</p>
+  <div class="triangle4"></div>
+</body>
+</html>
