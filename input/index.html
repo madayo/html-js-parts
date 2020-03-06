@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <script src="https://kit.fontawesome.com/23715ba5c5.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      padding: 5px 15px;
+    }
+    section {
+      padding-bottom: 30px;
+      border: 0;
+      border-top: none;
+      border-right: none;
+      border-left: none;
+      border-bottom: dotted 3px #aaaaaa;
+    }
+    label {
+      padding-right: 30px;
+    }
+    .u-input {
+      outline: 0;
+      border: 0;
+      border-top: none;
+      border-right: none;
+      border-left: none;
+      border-bottom: solid 1px #cccccc;
+      transition: 0.5s
+    }
+    .u-input:focus {
+      border-bottom: solid 1px lightgreen
+    }
+    .icon-input {
+      position: relative;
+    }
+    .icon-input input {
+      padding-left: 30px;
+    }
+    .icon-input i {
+      position: absolute;
+      left: 0px;
+    }
+    .unit-input {
+      position: relative;
+      display: flex;
+      width: 150px;
+    }
+    .unit-input input {
+      width: 100%;
+      padding-right: 30px;
+    }
+    .unit-input span {
+      position: absolute;
+      right: 0px;
+    }
+  </style>
+</head>
+<body>
+  <h1>いろいろな input type="text"</h1>
+  <section>
+    <h2>下線だけが引かれた入力欄</h2>
+    <p>下だけ border を残し、 focus 時の枠線なども無効化しつつ、 focus 時にまた下線だけ色を変える</p>
+    <p>transition で :focus 擬似クラスが適用されるまでの時間を若干調整している</p>
+    <label for="text1">氏名</label><input type="text" id="text1" class="u-input">
+  </section>
+  <section>
+    <h2>アイコン付き</h2>
+    <p>ほかの箇所でも応用できるが、親要素に position: relative, 子要素に position: absolute を指定することで、親要素に対する座標を絶対位置で指定することで任意の場所にアイコンを表示できる</p>
+    <p>あとはアイコン分の余白を調整している</p>
+    <div class="icon-input">
+      <input type="text" id="text2" class="u-input">
+      <i class="fa fa-search"></i>
+    </div>
+  </section>
+  <section>
+    <h2>単位付き</h2>
+    <p>先述のアイコンつきと同じ考え方</p>
+    <div class="unit-input">
+      <input type="text" id="text2" class="u-input">
+      <span>個</span>
+    </div>
+  </section>
+</body>
+</html>
