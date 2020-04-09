@@ -36,8 +36,30 @@
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
-  $( function() {
-    $("#datepicker").datepicker({
+  $(function() {
+    // 日本語化
+    $.datepicker.regional['ja'] = {
+      closeText: '閉じる',
+      prevText: '<前',
+      nextText: '次>',
+      currentText: '今日',
+      monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+      monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+      dayNames: ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'],
+      dayNamesShort: ['日', '月', '火', '水', '木', '金', '土'],
+      dayNamesMin: ['日', '月', '火', '水', '木', '金', '土'],
+      weekHeader: '週',
+      dateFormat: 'yy/mm/dd',
+      firstDay: 0,
+      isRTL: false,
+      showMonthAfterYear: true,
+      yearSuffix: '年'
+    };
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+
+    var today = new Date();
+
+    $("#datepicker1").datepicker({
       minDate: new Date('2019/08/15'),
       maxDate: new Date('2019/10/10'),
       beforeShowDay: function(date) {
@@ -54,14 +76,73 @@
         }
       }
     });
-    $("#datepicker").datepicker("setDate", new Date('2019/08/26'));
-  } );
+    $("#datepicker1").datepicker("setDate", new Date('2019/08/26'));
+
+    var f = function (addday) {
+      var day = new Date();
+      day.setDate(today.getDate() + addday);
+      return day.getFullYear() + "-" + (day.getMonth() + 1) + "-" + day.getDate();
+    };
+    var opendates = [
+      {
+        id: 1,
+        subId: 11,
+        date: f(2)
+      },
+      {
+        id: 2,
+        subId: 22,
+        date: f(35)
+      },
+      {
+        id: 2,
+        subId: 33,
+        date: f(70)
+      }
+    ];
+    $("#datepicker2").datepicker({
+      dateFormat: 'yy/mm/dd',
+      defaultDate: new Date(),  // デフォルト日
+      minDate: new Date(),      // 選択可能最小日
+      numberOfMonths: 3,        // 表示する月の数
+      showCurrentAtPos: 0,      // 現在月をどこに表示するか？これだと 1 つ目(1番左)になる
+      stepMonths: 3,            // 次の月へをクリックしたときに、切り替わる月の数
+      showButtonPanel: true,    // 「今日」などのボタン領域を表示する
+      gotoCurrent: true,        // 「今日」ボタンを表示する
+      beforeShowDay: function(date) {
+        // 予め用意した日付リストと完全一致したものだけが選択可能になる
+        for (var i = 0; i < opendates.length; i++) {
+          var opendate = new Date(opendates[i].date);
+          if (opendate.getFullYear() == date.getFullYear() && (opendate.getMonth() + 1) == (date.getMonth() + 1) && opendate.getDate() == date.getDate()) {
+            return [true, '', ''];
+          }
+        }
+        return [false, '', ''];
+      },
+      onSelect: function (date) {
+        date = new Date(date);
+        for (var i = 0; i < opendates.length; i++) {
+          var opendate = new Date(opendates[i].date);
+          if (opendate.getFullYear() == date.getFullYear() && (opendate.getMonth() + 1) == (date.getMonth() + 1) && opendate.getDate() == date.getDate()) {
+            alert('予め定義しておいた object(DB の値で組み立てる)を使用して、 form を動的に書き換えたり、 hidden の値を設定するなどして任意の URL に submit させる');
+          }
+        }
+      },
+    });
+  });
   </script>
 </head>
 <body>
 
-<p>Date: <input type="text" id="datepicker"></p>
+<p>休日の色付けと定休日</p>
+<p>最小日付なども</p>
+<input type="text" id="datepicker1">
+<hr>
 
+<p>3ヶ月分の表示</p>
+<p>日付を選択したときのアクションを変更</p>
+<input type="text" id="datepicker2">
+<hr>
 
 </body>
 </html>
