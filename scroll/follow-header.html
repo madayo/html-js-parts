@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    html {
+      margin: 0 30px;
+    }
+    .navbar {
+      height: 70px;
+      color: white;
+      background-color: #494545;
+    }
+    .header {
+      height: 70px;
+      background-color: #cbe8e8;
+    }
+    .body {
+      border: solid 1px #494545;
+    }
+    .content {
+      height: 400px;
+    }
+    .fixed {
+      display: block;
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 1030;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">ナビゲーション</div>
+  <div id="header" class="header">
+    タブレット・スマホ向けの画面幅になると「ここ」を画面上部に固定します。
+  </div>
+  <div id="body" class="body">
+    <div id="content1" class="content">記事1</div>
+    <div id="content2" class="content">記事2</div>
+    <div id="content3" class="content">記事3</div>
+    <div id="content4" class="content">記事4</div>
+    <div id="content5" class="content">記事5</div>
+    <div id="content6" class="content">記事6</div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const onScroll = function () {
+        // タブレット・スマホ向け
+        if (matchMedia('(max-width: 768px)').matches) {
+          // ある要素が画面から見きれるかどうかを判定して、ヘッダー部分を固定表示する
+          const header = document.querySelector('#header')
+          const body = document.querySelector('#body')
+          const targetPositionY = body.getBoundingClientRect().top
+          // 0 だと若干余白とかの関係でタイミングがちょっと遅く感じるので 20 くらいにしておく
+          if (targetPositionY > 20) {
+            header.classList.remove('fixed')
+          } else {
+            header.classList.add('fixed')
+          }
+        }
+      }
+      window.addEventListener('scroll', onScroll)
+    })
+  </script>
+</body>
+</html>
