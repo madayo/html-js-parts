@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app" class="container-fluid mt-4 text-center">
+    <ul class="list-group">
+      <li v-for="(list, index) in lists" class="list-group-item">
+        <input type="text" placeholder="メモとして活用してください" class="form-control mr-3">
+        <div class="d-flex mt-2">
+          <input type="text" readonly class="form-control" :value="formatMs(list.accumulationMilliSeconds)">
+          <button @click="startTimer(index)" :disabled="list.status === 'running'" type="button" class="mx-2 btn btn-sm btn-info">Start</button>
+          <button @click="stopTimer(index)"  :disabled="list.status === 'stopped'" type="button" class="mx-2 btn btn-sm btn-info">Stop</button>
+          <button @click="resetTimer(index)" type="button" class="mx-2 btn btn-sm btn-danger">Reset</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script>
+    const initTimer = (id) => {
+      return {
+        id: id,
+        timer : null,                   // setInterval() を用いた、累積ミリ秒の加算用
+        status : 'stopped',             // 状態(stopped: 停止, running: 実行中)
+        runningAt : null,               // 計測の起点となる時点でのミリ秒
+        accumulationMilliSeconds : 0,   // タイマーが動いていた累積ミリ秒
+      }
+    }
+    new Vue({
+      el: '#app',
+      data: {
+        lists: new Array(10).fill('').map((v, i) => { return initTimer(i) })
+      },
+      methods: {
+        formatMs(_ms) {
+          const hour = Math.floor(_ms / 3600000);
+          const minute = Math.floor((_ms - 3600000 * hour) / 60000);
+          const hh = ('00' + hour).slice(-2);
+          const mm = ('00' + minute).slice(-2);
+          const ms = ('00000' + (_ms % 60000)).slice(-5);
+          return `経過時間: ${hh} 時間 ${mm} 分 ${ms.slice(0,2)}.${ms.slice(2,5)} 秒`;
+        },
+        startTimer(id) {
+          if (this.lists[id].status === 'stopped') {
+            this.lists[id].status = 'running'
+            this.lists[id].runningAt = Date.now()
+            // 10ms ごとに経過ミリ秒を加算
+            this.lists[id].timer = setInterval( () => {
+              this.lists[id].accumulationMilliSeconds += (Date.now() - this.lists[id].runningAt)
+              this.lists[id].runningAt = Date.now()
+            }, 10)
+          }
+        },
+        stopTimer(id) {
+          if (this.lists[id].status === 'running') {
+            clearInterval(this.lists[id].timer)
+            this.lists[id].timer = null
+            this.lists[id].status = 'stopped'
+            this.lists[id].runningAt = null
+          }
+        },
+        resetTimer(id) {
+          clearInterval(this.lists[id].timer)
+          this.lists[id].timer = null
+          this.lists[id].status = 'stopped'
+          this.lists[id].runningAt = null
+          this.lists[id].accumulationMilliSeconds = 0
+        }
+      }
+    })
+  </script>
+</body>
+</html>
