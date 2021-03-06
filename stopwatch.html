@@ -12,8 +12,9 @@
     <ul class="list-group">
       <li v-for="(list, index) in lists" class="list-group-item">
         <input type="text" placeholder="メモとして活用してください" class="form-control mr-3">
+        <input type="text" readonly class="d-block d-md-none mt-2 form-control" :value="formatMs(list.accumulationMilliSeconds)">
         <div class="d-flex mt-2">
-          <input type="text" readonly class="form-control" :value="formatMs(list.accumulationMilliSeconds)">
+          <input type="text" readonly class="d-none d-md-block form-control" :value="'経過時間:' + formatMs(list.accumulationMilliSeconds)">
           <button @click="startTimer(index)" :disabled="list.status === 'running'" type="button" class="mx-2 btn btn-sm btn-info">Start</button>
           <button @click="stopTimer(index)"  :disabled="list.status === 'stopped'" type="button" class="mx-2 btn btn-sm btn-info">Stop</button>
           <button @click="resetTimer(index)" type="button" class="mx-2 btn btn-sm btn-danger">Reset</button>
@@ -44,7 +45,7 @@
           const hh = ('00' + hour).slice(-2);
           const mm = ('00' + minute).slice(-2);
           const ms = ('00000' + (_ms % 60000)).slice(-5);
-          return `経過時間: ${hh} 時間 ${mm} 分 ${ms.slice(0,2)}.${ms.slice(2,5)} 秒`;
+          return `${hh} 時間 ${mm} 分 ${ms.slice(0,2)}.${ms.slice(2,5)} 秒`;
         },
         startTimer(id) {
           if (this.lists[id].status === 'stopped') {
