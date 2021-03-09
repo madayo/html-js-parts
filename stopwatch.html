@@ -6,9 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <title>Document</title>
+  <style>
+    .container {
+      max-width: 960px;
+    }
+  </style>
 </head>
 <body>
-  <div id="app" class="container-fluid mt-4 text-center">
+  <div id="app" class="container mt-4 text-center">
     <ul class="list-group">
       <li v-for="(list, index) in lists" class="list-group-item">
         <input type="text" placeholder="メモとして活用してください" class="form-control mr-3 mb-2">
