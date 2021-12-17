@@ -7,6 +7,14 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <title>Document</title>
   <style>
+    html, body {
+      font-size: 1.0rem;
+    }
+    @media screen and (max-width: 480px) {
+      html, body {
+        font-size: 0.9rem;
+      }
+    }
     .container {
       max-width: 960px;
     }
@@ -24,8 +32,8 @@
     <ul class="list-group">
       <li v-for="(list, index) in lists" class="list-group-item">
         <input type="text" placeholder="メモとして活用してください" class="form-control mr-3 mb-2">
-        <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-block d-md-none form-control']" :value="formatMs(list.accumulationMilliSeconds)">
         <div class="d-flex mt-2">
+          <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-block d-md-none form-control']" :value="formatMs(list.accumulationMilliSeconds)">
           <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-none d-md-block form-control']" :value="'経過時間: ' + formatMs(list.accumulationMilliSeconds)">
           <button v-show="list.status === 'stopped'" @click="startTimer(index)" :disabled="list.status === 'running'" type="button" class="mx-2 btn btn-sm btn-info">Start</button>
           <div v-show="list.status === 'running'" class="mx-3 spinner-border text-info" role="status"></div>
@@ -49,7 +57,7 @@
     new Vue({
       el: '#app',
       data: {
-        lists: new Array(10).fill('').map((v, i) => { return initTimer(i) })
+        lists: new Array(15).fill('').map((v, i) => { return initTimer(i) })
       },
       methods: {
         formatMs(_ms) {
