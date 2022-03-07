@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>video タグ</title>
+</head>
+<body>
+  <a href="/youtube">戻る</a>
+  <div>
+    <video
+      id="video"
+      src="//samplelib.com/lib/preview/mp4/sample-5s.mp4"
+      width="400"
+      height="300"
+      controls=""
+      disablepictureinpicture=""
+      preload="none"
+      poster="https://samplelib.com/lib/preview/mp4/sample-5s.jpg"
+      controlslist="nodownload">
+    </video>
+  </div>
+  <ul id="playerEventResults"></ul>
+  <script>
+    /**
+     * デバッグ用
+     */
+    function appedPlayerEventResults(event, str) {
+      const li = document.createElement('li');
+      li.innerText = event + ' : ' + str;
+      document.querySelector('#playerEventResults').append(li);
+    }
+
+    document.getElementById('video').addEventListener('loadstart', function () {
+      appedPlayerEventResults('loadstart', '読み込み開始');
+    });
+    document.getElementById('video').addEventListener('progress', function () {
+      appedPlayerEventResults('progress', '読み込み中');
+    });
+    document.getElementById('video').addEventListener('suspend', function () {
+      appedPlayerEventResults('suspend', '読み込み中だけど一時休止');
+    });
+    document.getElementById('video').addEventListener('abort', function () {
+      appedPlayerEventResults('abort', '読み込み中に中断');
+    });
+    document.getElementById('video').addEventListener('error', function () {
+      appedPlayerEventResults('error', '読み込み時にエラー');
+    });
+    document.getElementById('video').addEventListener('emptied', function () {
+      appedPlayerEventResults('emptied', 'エラーなどが原因で読み込みデータが空に');
+    });
+    document.getElementById('video').addEventListener('stalled', function () {
+      appedPlayerEventResults('stalled', '予期せぬエラーで読み込めない');
+    });
+    document.getElementById('video').addEventListener('loadedmetadata', function () {
+      appedPlayerEventResults('loadedmetadata', '読み込みが完了して、ファイルサイズや長さなどが取得できた');
+    });
+    document.getElementById('video').addEventListener('loadeddata', function () {
+      appedPlayerEventResults('loadeddata', '指定された位置からの再生準備が整った');
+    });
+    document.getElementById('video').addEventListener('canplay', function () {
+      appedPlayerEventResults('canplay', '再生可能だが、最後まで読み込みは完了していない');
+    });
+    document.getElementById('video').addEventListener('canplaythrough', function () {
+      appedPlayerEventResults('canplaythrough', '再生可能で最後まで読み込みもされている');
+    });
+    document.getElementById('video').addEventListener('playing', function () {
+      appedPlayerEventResults('playing', 'イベント発生');
+    });
+    document.getElementById('video').addEventListener('waiting', function () {
+      appedPlayerEventResults('waiting', '次のフレームの読み込み待ち');
+    });
+    document.getElementById('video').addEventListener('seeking', function () {
+      appedPlayerEventResults('seeking', '再生位置移動中');
+    });
+    document.getElementById('video').addEventListener('seeked', function () {
+      appedPlayerEventResults('seeked', '再生位置移動完了');
+    });
+    document.getElementById('video').addEventListener('ended', function () {
+      appedPlayerEventResults('ended', '再生終了');
+    });
+    document.getElementById('video').addEventListener('durationchange', function () {
+      appedPlayerEventResults('durationchange', 'ファイルサイズ、長さなどが更新された');
+    });
+    document.getElementById('video').addEventListener('timeupdate', function () {
+      appedPlayerEventResults('timeupdate', '再生位置の更新');
+    });
+    document.getElementById('video').addEventListener('play', function () {
+      appedPlayerEventResults('play', '再生中');
+    });
+    document.getElementById('video').addEventListener('pause', function () {
+      appedPlayerEventResults('pause', '一時停止');
+    });
+    document.getElementById('video').addEventListener('ratechange', function () {
+      appedPlayerEventResults('ratechange', 'レート変更');
+    });
+    document.getElementById('video').addEventListener('volumechange', function () {
+      appedPlayerEventResults('volumechange', 'ボリューム変更');
+    });
+
+  </script>
+</body>
+</html>

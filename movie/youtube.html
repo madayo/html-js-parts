@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Youtube</title>
+</head>
+<body>
+  <a href="/youtube">戻る</a>
+  <div>
+    <label>Youtube 内製プレーヤー
+      <a target="_blank" rel="noopener" href="https://developers.google.com/youtube/iframe_api_reference?hl=ja">https://developers.google.com/youtube/iframe_api_reference?hl=ja</a>
+    </label>
+  </div>
+  <div class="movie-area">
+    <div id="youtubePlayer"></div>
+    <div id="youtubePlayerWrapper"></div>
+  </div>
+  <div id="youtubeEndedImage" style="display: none;">
+    <img src="https://placehold.jp/3d4070/ffffff/640x480.png?text=%E5%8B%95%E7%94%BB%E7%B5%82%E4%BA%86">
+  </div>
+  <div class="buttons">
+    <button id="play">再生</button>
+    <button id="pause">一時停止</button>
+    <button id="back">5秒戻る</button>
+    <button id="forward">5秒進む</button>
+    <button id="volumeDown">音量ダウン</button>
+    <button id="volumeUp">音量アップ</button>
+    <button id="mute">ミュート</button>
+  </div>
+  <ul id="playerEventResults"></ul>
+  <script>
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    let player;
+    const width = 640;
+    const height = 480;
+    const videoId = 'bjmBJ1Fl0cs';
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('youtubePlayer', {
+        height,
+        width,
+        videoId,
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        },
+        playerVars: {
+          rel: 0, // 再生終了後に関連動画を表示しない
+        }
+      });
+    }
+
+    /**
+     * プレーヤー準備完了
+     */
+    function onPlayerReady(event) {
+      event.target.playVideo();
+      appedPlayerEventResults('onReady', '動画読み込み完了時に自動再生')
+    }
+
+    /**
+     * プレーヤー状態変化
+     */
+    function onPlayerStateChange(event) {
+      const status = event.data;
+      if (status === YT.PlayerState.ENDED) {
+        document.querySelector('.movie-area').style.display = 'none';
+        document.querySelector('#youtubeEndedImage').style.display = 'block';
+        appedPlayerEventResults('onStateChange', '動画終了')
+      } else if (status === YT.PlayerState.PLAYING) {
+        document.querySelector('.movie-area').style.display = 'block';
+        document.querySelector('#youtubeEndedImage').style.display = 'none';
+        appedPlayerEventResults('onStateChange', '再生中')
+      } else if (status === YT.PlayerState.PAUSED) {
+        appedPlayerEventResults('onStateChange', '一時停止')
+      } else if (status === YT.PlayerState.BUFFERING) {
+        appedPlayerEventResults('onStateChange', '読込中')
+      } else if (status === YT.PlayerState.CUED) {
+        appedPlayerEventResults('onStateChange', '頭出し済み')
+      }
+    }
+
+    // 独自ボタン 再生
+    document.getElementById('play').addEventListener('click', function () {
+      player.playVideo();
+    });
+    // 独自ボタン 一時停止
+    document.getElementById('pause').addEventListener('click', function () {
+      player.pauseVideo();
+    });
+    // 独自ボタン 5 秒戻る
+    document.getElementById('back').addEventListener('click', function () {
+      const currentTime = player.getCurrentTime();
+      player.seekTo(currentTime - 5);
+    });
+    // 独自ボタン 5 秒進む
+    document.getElementById('forward').addEventListener('click', function () {
+      const currentTime = player.getCurrentTime();
+      player.seekTo(currentTime + 5);
+    });
+    // 独自ボタン 音量ダウン
+    document.getElementById('volumeDown').addEventListener('click', function () {
+      const currentVolume = player.getVolume();
+      player.setVolume(currentVolume - 10);
+    });
+    // 独自ボタン 音量アップ
+    document.getElementById('volumeUp').addEventListener('click', function () {
+      const currentVolume = player.getVolume();
+      player.setVolume(currentVolume + 10);
+    });
+    // 独自ボタン 音量アップ
+    document.getElementById('mute').addEventListener('click', function () {
+      if (player.isMuted()) {
+        player.unMute();
+      } else {
+        player.mute();
+      }
+    });
+
+    /**
+     * デバッグ用
+     */
+    function appedPlayerEventResults(event, str) {
+      const li = document.createElement('li');
+      li.innerText = event + ' : ' + str;
+      document.querySelector('#playerEventResults').append(li);
+    }
+  </script>
+  <style>
+    .movie-area {
+      position: relative;
+      text-align: center;
+    }
+    #youtubePlayer {
+      width: 100%;
+      height: 480px;
+    }
+    #youtubePlayerWrapper {
+      width: 100%;
+      height: 480px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #youtubeEndedImage {
+      text-align: center;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+    }
+  </style>
+</body>
+</html>
