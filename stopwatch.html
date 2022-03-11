@@ -68,9 +68,11 @@
       status: 'confirm',
       label: '本当に良いですか？'
     }
+    const saveTerm = 1000 * 60 * 60 * 3
     new Vue({
       el: '#app',
       data: {
+        lastLocalStorageSaved: new Date().getTime(),
         allResetCondition: allResetDefault,
         lists: createEmptyTimer()
       },
@@ -134,7 +136,12 @@
         lists: {
           handler(newValue, oldValue) {
             // ローカルストレージへの保存
-            localStorage.lists = JSON.stringify(this.lists)
+            // タイマーは絶えず動いているので、毎回保存するとちょっと負荷高い、3 分おきに保存する
+            const current = new Date().getTime()
+            if (this.lastLocalStorageSaved + saveTerm < current) {
+              localStorage.lists = JSON.stringify(this.lists)
+              this.lastLocalStorageSaved = current
+            }
           },
           deep: true
         }
