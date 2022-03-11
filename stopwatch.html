@@ -29,9 +29,12 @@
 </head>
 <body>
   <div id="app" class="container mt-4 text-center">
+    <div class="my-2">
+      <button type="button" class="btn btn-sm btn-danger" @click="allReset">{{ allResetCondition.label }}</button>
+    </div>
     <ul class="list-group">
       <li v-for="(list, index) in lists" class="list-group-item">
-        <input type="text" placeholder="メモとして活用してください" class="form-control mr-3 mb-2">
+        <input type="text" placeholder="メモとして活用してください" class="form-control mr-3 mb-2" v-model="list.name">
         <div class="d-flex mt-2">
           <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-block d-md-none form-control']" :value="formatMs(list.accumulationMilliSeconds)">
           <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-none d-md-block form-control']" :value="'経過時間: ' + formatMs(list.accumulationMilliSeconds)">
@@ -45,28 +48,46 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
   <script>
-    const initTimer = (id) => {
+    const initTimer = id => {
       return {
         id: id,
+        name: '',
         timer : null,                   // setInterval() を用いた、累積ミリ秒の加算用
         status : 'stopped',             // 状態(stopped: 停止, running: 実行中)
         runningAt : null,               // 計測の起点となる時点でのミリ秒
         accumulationMilliSeconds : 0,   // タイマーが動いていた累積ミリ秒
       }
     }
+    const createEmptyTimer = id => new Array(15).fill('').map((v, i) => { return initTimer(i) })
+
+    const allResetDefault = {
+      status: 'default',
+      label: '全リセット'
+    }
+    const allResetConfirm = {
+      status: 'confirm',
+      label: '本当に良いですか？'
+    }
     new Vue({
       el: '#app',
       data: {
-        lists: new Array(15).fill('').map((v, i) => { return initTimer(i) })
+        allResetCondition: allResetDefault,
+        lists: createEmptyTimer()
+      },
+      mounted() {
+        // ローカルストレージからの復元
+        if (localStorage.lists) {
+          this.lists = JSON.parse(localStorage.lists);
+        }
       },
       methods: {
         formatMs(_ms) {
-          const hour = Math.floor(_ms / 3600000);
-          const minute = Math.floor((_ms - 3600000 * hour) / 60000);
-          const hh = ('00' + hour).slice(-2);
-          const mm = ('00' + minute).slice(-2);
-          const ms = ('00000' + (_ms % 60000)).slice(-5);
-          return `${hh} 時間 ${mm} 分 ${ms.slice(0,2)}.${ms.slice(2,5)} 秒`;
+          const hour = Math.floor(_ms / 3600000)
+          const minute = Math.floor((_ms - 3600000 * hour) / 60000)
+          const hh = ('00' + hour).slice(-2)
+          const mm = ('00' + minute).slice(-2)
+          const ms = ('00000' + (_ms % 60000)).slice(-5)
+          return `${hh} 時間 ${mm} 分 ${ms.slice(0,2)}.${ms.slice(2,5)} 秒`
         },
         startTimer(id) {
           if (this.lists[id].status === 'stopped') {
@@ -93,8 +114,31 @@
           this.lists[id].status = 'stopped'
           this.lists[id].runningAt = null
           this.lists[id].accumulationMilliSeconds = 0
+        },
+        allReset() {
+          if (this.allResetCondition.status === allResetDefault.status) {
+            this.allResetCondition = allResetConfirm
+            // その後確定しなくても 3 秒後に戻す
+            setTimeout(() => {
+              console.log(this.allResetCondition)
+              this.allResetCondition = allResetDefault
+              console.log(this.allResetCondition)
+            }, 3000)
+          } else {
+            this.lists = createEmptyTimer()
+            this.allResetCondition = allResetDefault
+          }
         }
-      }
+      },
+      watch: {
+        lists: {
+          handler(newValue, oldValue) {
+            // ローカルストレージへの保存
+            localStorage.lists = JSON.stringify(this.lists)
+          },
+          deep: true
+        }
+      },
     })
   </script>
 </body>
