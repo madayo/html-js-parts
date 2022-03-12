@@ -68,18 +68,24 @@
       status: 'confirm',
       label: '本当に良いですか？'
     }
-    const saveTerm = 1000 * 60 * 60 * 3
+    // タイマーは絶えず動いているので、watch で常時処理すると負荷が高いので 10 秒おきに watch させる
+    const saveTerm = 1000 * 10
     new Vue({
       el: '#app',
       data: {
-        lastLocalStorageSaved: new Date().getTime(),
+        lastLocalStorageSavedAt: new Date().getTime(),
         allResetCondition: allResetDefault,
         lists: createEmptyTimer()
       },
       mounted() {
         // ローカルストレージからの復元
         if (localStorage.lists) {
-          this.lists = JSON.parse(localStorage.lists);
+          loadedLists = JSON.parse(localStorage.lists);
+          // status はすべて stopped 停止状態にしておく
+          this.lists = loadedLists.map( (v) => {
+            v.status = 'stopped'
+            return v
+          })
         }
       },
       methods: {
@@ -122,12 +128,12 @@
             this.allResetCondition = allResetConfirm
             // その後確定しなくても 3 秒後に戻す
             setTimeout(() => {
-              console.log(this.allResetCondition)
               this.allResetCondition = allResetDefault
-              console.log(this.allResetCondition)
             }, 3000)
           } else {
             this.lists = createEmptyTimer()
+            localStorage.lists = JSON.stringify(this.lists)
+            this.lastLocalStorageSavedAt = new Date().getTime()
             this.allResetCondition = allResetDefault
           }
         }
@@ -136,11 +142,11 @@
         lists: {
           handler(newValue, oldValue) {
             // ローカルストレージへの保存
-            // タイマーは絶えず動いているので、毎回保存するとちょっと負荷高い、3 分おきに保存する
+            // タイマーは絶えず動いているので、毎回保存するとちょっと負荷高い
             const current = new Date().getTime()
-            if (this.lastLocalStorageSaved + saveTerm < current) {
+            if (this.lastLocalStorageSavedAt + saveTerm < current) {
               localStorage.lists = JSON.stringify(this.lists)
-              this.lastLocalStorageSaved = current
+              this.lastLocalStorageSavedAt = current
             }
           },
           deep: true
