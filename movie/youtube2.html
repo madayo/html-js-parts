@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Youtube</title>
+</head>
+<body>
+  <a href="/youtube">戻る</a>
+  <div>
+    <label>Youtube 内製プレーヤー
+      <a target="_blank" rel="noopener" href="https://developers.google.com/youtube/iframe_api_reference?hl=ja">https://developers.google.com/youtube/iframe_api_reference?hl=ja</a>
+    </label>
+  </div>
+  <div class="movie-area">
+    <div id="youtubePlayerWrapper">
+      <div id="youtubePlayer" style="display: none;"></div>
+    </div>
+    <div class="select-scene-wrapper" data-scene="1" data-next-movie-id="jrwWiLUzCBI" style="display: none;">
+      <div class="select-scene">
+        <p>回答を選択してください</p>
+        <p class="choice" data-choice="シーン1 選択肢1">シーン1 選択肢1</p>
+        <p class="choice" data-choice="シーン1 選択肢2">シーン1 選択肢2</p>
+      </div>
+    </div>
+    <div class="select-scene-wrapper" data-scene="2" data-next-movie-id="RUAgFNz7IpA" style="display: none;">
+      <div class="select-scene">
+        <p>回答を選択してください</p>
+        <p class="choice" data-choice="シーン2 選択肢1">シーン2 選択肢1</p>
+        <p class="choice" data-choice="シーン2 選択肢2">シーン2 選択肢2</p>
+      </div>
+    </div>
+  </div>
+  <div id="youtubeEndedImage" style="display: none;">
+    <img src="https://placehold.jp/3d4070/ffffff/640x480.png?text=%E5%9B%9E%E7%AD%94%E3%81%AB%E9%80%B2%E3%82%80">
+  </div>
+  <div id="progressArea">
+    <img src="./loading.svg">
+    <progress id="progressBar" max="100" value="0"></progress>
+    <span id="progressPercentage">0%</span>
+  </div>
+  <div id="overlay"></div>
+  <button id="seekToLaseThreeSeconds">残り 3 秒までスキップする</button>
+  <ul id="log"></ul>
+  <script>
+    const tag = document.createElement('script')
+    tag.src = "https://www.youtube.com/iframe_api"
+    const firstScriptTag = document.getElementsByTagName('script')[0]
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+
+    let player = null
+    let progress = 0
+    let intervalId
+    const selectedChoices = []
+    let currentScene = 1
+    const width = 640
+    const height = 480
+    const firstVideoId = 'bjmBJ1Fl0cs'
+    function onYouTubeIframeAPIReady() {
+      loadPlayer(firstVideoId)
+    }
+
+    function loadPlayer(videoId) {
+      if (player === null) {
+        player = new YT.Player('youtubePlayer', {
+          height,
+          width,
+          videoId,
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          },
+          playerVars: {
+            rel: 0, // 再生終了後に関連動画を表示しない
+          }
+        })
+      } else {
+        logging('次の動画読み込み開始')
+        player.loadVideoById(videoId)
+        logging('次の動画読み込み終了')
+      }
+    }
+    /**
+     * プレーヤー準備完了
+     */
+    function onPlayerReady(event) {
+      player.mute()
+      logging('最初の動画読み込み開始')
+      intervalId = setInterval(() => {
+        stepProgress(event)
+      }, 30)
+    }
+
+    /**
+     * プレーヤー状態変化
+     */
+    function onPlayerStateChange(event) {
+      const status = event.data
+      if (status === YT.PlayerState.ENDED) {
+        logging('動画終了')
+        switch (currentScene) {
+          case 1:
+            document.querySelector('.select-scene-wrapper[data-scene="1"]').style.display = 'block'
+            document.querySelector('.select-scene-wrapper[data-scene="2"]').style.display = 'none'
+            break
+          case 2:
+            document.querySelector('.select-scene-wrapper[data-scene="1"]').style.display = 'none'
+            document.querySelector('.select-scene-wrapper[data-scene="2"]').style.display = 'block'
+            break
+          case 3:
+            document.querySelector('.select-scene-wrapper[data-scene="1"]').style.display = 'none'
+            document.querySelector('.select-scene-wrapper[data-scene="2"]').style.display = 'none'
+            document.querySelector('.movie-area').style.display = 'none'
+            document.querySelector('#youtubeEndedImage').style.display = 'block'
+            for(const v of selectedChoices) {
+              logging(v)
+            }
+            break
+        }
+      } else if (status === YT.PlayerState.PLAYING) {
+        logging('動画再生')
+        document.querySelector('.movie-area').style.display = 'block'
+        document.querySelector('#youtubeEndedImage').style.display = 'none'
+      }
+    }
+
+    /**
+     * ローディングの進捗度表示
+     */
+    function stepProgress(youtubeEvent) {
+      progress++
+      document.getElementById('progressBar').value = progress
+      document.getElementById('progressPercentage').innerText = progress + '%'
+      if (progress >= 100) {
+        clearInterval(intervalId)
+        document.getElementById('overlay').style.display = 'none'
+        document.getElementById('progressArea').style.display = 'none'
+        document.getElementById('youtubePlayer').style.display = 'block'
+        youtubeEvent.target.playVideo()
+        logging('最初の動画読み込み完了')
+      }
+    }
+
+    /**
+     * 回答の選択
+     */
+    function selectChoice(choiceElement) {
+      logging('回答選択')
+      const sceneWrapper = choiceElement.parentElement.parentElement
+      // 選択した回答を記録
+      selectedChoices.push(choiceElement.dataset['choice'])
+      // 次のシーンへ
+      currentScene++
+      const nextMovieId = sceneWrapper.dataset['nextMovieId']
+      sceneWrapper.style.display = 'none'
+      loadPlayer(nextMovieId)
+    }
+
+    function logging(str) {
+      const li = document.createElement('li');
+      li.innerText = str;
+      document.querySelector('#log').append(li);
+    }
+
+    document.querySelectorAll('.choice').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+        selectChoice(event.target)
+      })
+    })
+    document.querySelector('#seekToLaseThreeSeconds').addEventListener('click', function () {
+      // 再生終了まで待つのがめんどいので残り数秒まで移動
+      player.seekTo(player.getDuration() - 3, true)
+    })
+
+    logging('ページアクセス')
+</script>
+  <style>
+    body {
+      margin: auto;
+      padding: 20px;
+    }
+    .movie-area {
+      width: 640px;
+      height: 480px;
+      margin: auto;
+      position: relative;
+    }
+    #youtubePlayerWrapper {
+      pointer-events: none;
+    }
+    .select-scene-wrapper {
+      width: 640px;
+      height: 480px;
+      background-color: #555555;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .select-scene {
+      height: 100%;
+      margin: auto;
+      padding: 0 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .select-scene * {
+      width: 100%;
+      margin: 15px auto;
+      padding: 10px;
+      text-align: left;
+      color: #b1b1b1;
+    }
+    .select-scene .choice {
+      border: solid 1px #999999;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #youtubeEndedImage {
+      text-align: center;
+    }
+    #overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: rgba(100, 100, 100, .8);
+      z-index: 2147483646;
+    }
+    #progressArea {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: absolute;
+      width: 100%;
+      height: 120px;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      z-index: 2147483647;
+    }
+    #progressArea * {
+      text-align: center;
+      margin: auto;
+    }
+    #progressArea #progressPercentage {
+      color: rgb(146, 189, 247);
+    }
+    progress {
+      -webkit-appearance: none;
+      height: 5px;
+    }
+    ::-webkit-progress-bar {
+      background: rgba(100, 100, 100, .8);
+      border-radius: 5px;
+      border: 1px solid gray;
+    }
+    ::-webkit-progress-value {
+      background-color: rgb(146, 189, 247);
+    }
+  </style>
+</body>
+</html>
