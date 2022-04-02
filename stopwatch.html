@@ -122,6 +122,9 @@
           this.lists[id].status = 'stopped'
           this.lists[id].runningAt = null
           this.lists[id].accumulationMilliSeconds = 0
+          localStorage.lists = JSON.stringify(this.lists)
+          this.lastLocalStorageSavedAt = new Date().getTime()
+          this.allResetCondition = allResetDefault
         },
         allReset() {
           if (this.allResetCondition.status === allResetDefault.status) {
