@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vimeo タグ</title>
+</head>
+<body>
+  <a href="/movie">戻る</a>
+  <div>
+    <p><b>特に制御入れない</b></p>
+    <iframe src="https://player.vimeo.com/video/710453774?h=7c7a5facd3"
+      width="640" height="360" frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+  </div>
+  <ul id="log"></ul>
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    var iframe = document.querySelector('iframe');
+    var player = new Vimeo.Player(iframe);
+
+    player.on('play', function() {
+      var li = document.createElement('li')
+      li.innerText = '再生'
+      document.getElementById('log').append(li)
+    });
+
+    player.getVideoTitle().then(function(title) {
+      var li = document.createElement('li')
+      li.innerText = '動画タイトル取得完了 : ' + title
+      document.getElementById('log').append(li)
+    });
+  </script>
+</body>
+</html>
