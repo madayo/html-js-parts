@@ -37,7 +37,7 @@
         <input type="text" class="form-control mr-3 mb-2" v-model="list.name">
         <div class="d-flex mt-2">
           <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-block d-md-none form-control']" :value="formatMs(list.accumulationMilliSeconds)">
-          <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-none d-md-block form-control']" :value="'経過時間: ' + formatMs(list.accumulationMilliSeconds)">
+          <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-none d-md-block form-control']" :value="formatMs(list.accumulationMilliSeconds)">
           <button v-show="list.status === 'stopped'" @click="startTimer(index)" :disabled="list.status === 'running'" type="button" class="mx-2 btn btn-sm btn-info">Start</button>
           <div v-show="list.status === 'running'" class="mx-3 spinner-border text-info" role="status"></div>
           <button @click="stopTimer(index)"  :disabled="list.status === 'stopped'" type="button" class="mx-2 btn btn-sm btn-info">Stop</button>
@@ -95,7 +95,7 @@
           const hh = ('00' + hour).slice(-2)
           const mm = ('00' + minute).slice(-2)
           const ms = ('00000' + (_ms % 60000)).slice(-5)
-          return `${hh} 時間 ${mm} 分 ${ms.slice(0,2)}.${ms.slice(2,5)} 秒`
+          return `${hh} : ${mm} : ${ms.slice(0,2)}.${ms.slice(2,5)} `
         },
         startTimer(id) {
           if (this.lists[id].status === 'stopped') {
