@@ -34,7 +34,7 @@
     </div>
     <ul class="list-group">
       <li v-for="(list, index) in lists" class="list-group-item">
-        <input type="text" placeholder="メモとして活用してください" class="form-control mr-3 mb-2" v-model="list.name">
+        <input type="text" class="form-control mr-3 mb-2" v-model="list.name">
         <div class="d-flex mt-2">
           <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-block d-md-none form-control']" :value="formatMs(list.accumulationMilliSeconds)">
           <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-none d-md-block form-control']" :value="'経過時間: ' + formatMs(list.accumulationMilliSeconds)">
@@ -62,11 +62,11 @@
 
     const allResetDefault = {
       status: 'default',
-      label: '全リセット'
+      label: 'Reset all'
     }
     const allResetConfirm = {
       status: 'confirm',
-      label: '本当に良いですか？'
+      label: 'Are you sure?'
     }
     // タイマーは絶えず動いているので、watch で常時処理すると負荷が高いので 10 秒おきに watch させる
     const saveTerm = 1000 * 10
@@ -134,6 +134,9 @@
               this.allResetCondition = allResetDefault
             }, 3000)
           } else {
+            for (let i = 0; i < 15; i++) {
+              this.stopTimer(i)
+            }
             this.lists = createEmptyTimer()
             localStorage.lists = JSON.stringify(this.lists)
             this.lastLocalStorageSavedAt = new Date().getTime()
