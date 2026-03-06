@@ -1,172 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <title>🕐️Stopwatch🕐️</title>
-  <style>
-    html, body {
-      font-size: 22px;
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>🕐️Stopwatch🕐️</title>
+    <style>
+      html,
+      body {
+        font-size: 22px;
+      }
 
       @media screen and (max-width: 480px) {
-        font-size: 0.9rem;
-      }
-    }
-    .container {
-      max-width: 100%;
-      margin: 10px;
-    }
-    .form-control {
-      height: 2.0rem;
-      font-size: 0.85rem;
-    }
-    .list-group-item {
-      padding: .55rem 1.25rem;
-    }
 
-    .timer-item {
-      flex: 1 1 600px;
-      max-width: 600px;
-      padding: 0.75rem;
-    }
-  </style>
-</head>
-<body>
-  <div id="app" class="container mt-4 text-center">
-    <div class="my-2">
-      <button type="button" class="btn btn-sm btn-danger" @click="allReset">{{ allResetCondition.label }}</button>
-    </div>
-    <div class="d-flex flex-wrap timer-row">
-      <div v-for="(list, index) in lists" class="timer-item">
-        <div class="list-group-item d-flex flex-column ">
-          <input type="text" class="form-control mr-3 mb-2" v-model="list.name">
-          <div class="d-flex mt-2">
-            <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-block d-md-none form-control']" :value="formatMs(list.accumulationMilliSeconds)">
-            <input type="text" readonly :class="[{ 'border border-info rounded': list.status === 'running', 'border border-danger rounded': list.accumulationMilliSeconds > 0 }, 'd-none d-md-block form-control']" :value="formatMs(list.accumulationMilliSeconds)">
-            <button v-show="list.status === 'stopped'" @click="startTimer(index)" :disabled="list.status === 'running'" type="button" class="mx-2 btn btn-sm btn-info">Start</button>
-            <div v-show="list.status === 'running'" class="mx-3 spinner-border text-info" role="status"></div>
-            <button @click="stopTimer(index)"  :disabled="list.status === 'stopped'" type="button" class="mx-2 btn btn-sm btn-info">Stop</button>
-            <button @click="resetTimer(index)" type="button" class="mx-2 btn btn-sm btn-danger">Reset</button>
+        html,
+        body {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-white text-center">
+    <div id="app" class="mx-auto mt-4 max-w-full px-[10px]">
+      <div class="my-2">
+        <button type="button"
+          class="inline-flex items-center rounded bg-red-600 px-3 py-1 text-sm font-medium text-white hover:bg-red-700"
+          @click="allReset">
+          {{ allResetCondition.label }}
+        </button>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-1">
+        <div v-for="(list, index) in lists" class="flex-[1_1_500px] max-w-[600px] p-3">
+          <div class="flex flex-col rounded-md border border-gray-200 px-5 py-[0.55rem]">
+            <input type="text"
+              class="mb-2 mr-3 block h-8 w-full rounded border border-gray-300 px-3 text-[0.85rem] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              v-model="list.name">
+
+            <div class="mt-2 flex items-center">
+              <input type="text" readonly :class="[
+                'flex-1 h-8 max-w-[200px] rounded px-3 text-[0.85rem] focus:outline-none',
+                list.status === 'running' ? 'border border-sky-400' : 'border border-gray-300',
+                list.accumulationMilliSeconds > 0 ? 'border-[3px] border-red-500' : ''
+              ]" :value="formatMs(list.accumulationMilliSeconds)">
+
+              <div class="ml-3 flex w-[220px] items-center justify-start">
+                <button :disabled="list.status === 'running'" @click="startTimer(index)"
+                  type="button"
+                  class="mx-2 flex h-8 w-20 items-center justify-center rounded bg-sky-500 text-xs text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
+                  Start
+                </button>
+                <button @click="stopTimer(index)" :disabled="list.status === 'stopped'"
+                  type="button"
+                  class="mx-2 flex h-8 w-20 items-center justify-center rounded bg-sky-500 text-xs text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
+                  Stop
+                </button>
+                <button @click="resetTimer(index)" type="button"
+                  class="mx-2 flex h-8 w-20 items-center justify-center rounded bg-red-600 text-xs text-white hover:bg-red-700">
+                  Reset
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <script>
-    const initTimer = id => {
-      return {
-        id: id,
-        name: '',
-        timer : null,                   // setInterval() を用いた、累積ミリ秒の加算用
-        status : 'stopped',             // 状態(stopped: 停止, running: 実行中)
-        runningAt : null,               // 計測の起点となる時点でのミリ秒
-        accumulationMilliSeconds : 0,   // タイマーが動いていた累積ミリ秒
-      }
-    }
-    const createEmptyTimer = id => new Array(15).fill('').map((v, i) => { return initTimer(i) })
 
-    const allResetDefault = {
-      status: 'default',
-      label: 'Reset all'
-    }
-    const allResetConfirm = {
-      status: 'confirm',
-      label: 'Are you sure?'
-    }
-    // タイマーは絶えず動いているので、watch で常時処理すると負荷が高いので 10 秒おきに watch させる
-    const saveTerm = 1000 * 10
-    new Vue({
-      el: '#app',
-      data: {
-        lastLocalStorageSavedAt: new Date().getTime(),
-        allResetCondition: allResetDefault,
-        lists: createEmptyTimer()
-      },
-      mounted() {
-        // ローカルストレージからの復元
-        if (localStorage.lists) {
-          loadedLists = JSON.parse(localStorage.lists);
-          // status はすべて stopped 停止状態にしておく
-          this.lists = loadedLists.map( (v) => {
-            v.status = 'stopped'
-            return v
-          })
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+      const initTimer = id => {
+        return {
+          id: id,
+          name: '',
+          timer: null,
+          status: 'stopped',
+          runningAt: null,
+          accumulationMilliSeconds: 0,
         }
-      },
-      methods: {
-        formatMs(_ms) {
-          const hour = Math.floor(_ms / 3600000)
-          const minute = Math.floor((_ms - 3600000 * hour) / 60000)
-          const hh = ('00' + hour).slice(-2)
-          const mm = ('00' + minute).slice(-2)
-          const ms = ('00000' + (_ms % 60000)).slice(-5)
-          return `${hh} : ${mm} : ${ms.slice(0,2)}.${ms.slice(2,5)} `
+      }
+      const createEmptyTimer = id => new Array(15).fill('').map((v, i) => { return initTimer(i) })
+
+      const allResetDefault = {
+        status: 'default',
+        label: 'Reset all'
+      }
+      const allResetConfirm = {
+        status: 'confirm',
+        label: 'Are you sure?'
+      }
+      const saveTerm = 1000 * 10
+
+      new Vue({
+        el: '#app',
+        data: {
+          lastLocalStorageSavedAt: new Date().getTime(),
+          allResetCondition: allResetDefault,
+          lists: createEmptyTimer()
         },
-        startTimer(id) {
-          if (this.lists[id].status === 'stopped') {
-            this.lists[id].status = 'running'
-            this.lists[id].runningAt = Date.now()
-            // 10ms ごとに経過ミリ秒を加算
-            this.lists[id].timer = setInterval( () => {
-              this.lists[id].accumulationMilliSeconds += (Date.now() - this.lists[id].runningAt)
-              this.lists[id].runningAt = Date.now()
-            }, 10)
+        mounted() {
+          if (localStorage.lists) {
+            loadedLists = JSON.parse(localStorage.lists);
+            this.lists = loadedLists.map((v) => {
+              v.status = 'stopped'
+              return v
+            })
           }
         },
-        stopTimer(id) {
-          if (this.lists[id].status === 'running') {
+        methods: {
+          formatMs(_ms) {
+            const hour = Math.floor(_ms / 3600000)
+            const minute = Math.floor((_ms - 3600000 * hour) / 60000)
+            const hh = ('00' + hour).slice(-2)
+            const mm = ('00' + minute).slice(-2)
+            const ms = ('00000' + (_ms % 60000)).slice(-5)
+            return `${hh} : ${mm} : ${ms.slice(0, 2)}.${ms.slice(2, 5)} `
+          },
+          startTimer(id) {
+            if (this.lists[id].status === 'stopped') {
+              this.lists[id].status = 'running'
+              this.lists[id].runningAt = Date.now()
+              this.lists[id].timer = setInterval(() => {
+                this.lists[id].accumulationMilliSeconds += (Date.now() - this.lists[id].runningAt)
+                this.lists[id].runningAt = Date.now()
+              }, 10)
+            }
+          },
+          stopTimer(id) {
+            if (this.lists[id].status === 'running') {
+              clearInterval(this.lists[id].timer)
+              this.lists[id].timer = null
+              this.lists[id].status = 'stopped'
+              this.lists[id].runningAt = null
+            }
+          },
+          resetTimer(id) {
             clearInterval(this.lists[id].timer)
             this.lists[id].timer = null
             this.lists[id].status = 'stopped'
             this.lists[id].runningAt = null
-          }
-        },
-        resetTimer(id) {
-          clearInterval(this.lists[id].timer)
-          this.lists[id].timer = null
-          this.lists[id].status = 'stopped'
-          this.lists[id].runningAt = null
-          this.lists[id].accumulationMilliSeconds = 0
-          localStorage.lists = JSON.stringify(this.lists)
-          this.lastLocalStorageSavedAt = new Date().getTime()
-          this.allResetCondition = allResetDefault
-        },
-        allReset() {
-          if (this.allResetCondition.status === allResetDefault.status) {
-            this.allResetCondition = allResetConfirm
-            // その後確定しなくても 3 秒後に戻す
-            setTimeout(() => {
-              this.allResetCondition = allResetDefault
-            }, 3000)
-          } else {
-            for (let i = 0; i < 15; i++) {
-              this.stopTimer(i)
-            }
-            this.lists = createEmptyTimer()
+            this.lists[id].accumulationMilliSeconds = 0
             localStorage.lists = JSON.stringify(this.lists)
             this.lastLocalStorageSavedAt = new Date().getTime()
             this.allResetCondition = allResetDefault
-          }
-        }
-      },
-      watch: {
-        lists: {
-          handler(newValue, oldValue) {
-            // ローカルストレージへの保存
-            // タイマーは絶えず動いているので、毎回保存するとちょっと負荷高い
-            const current = new Date().getTime()
-            if (this.lastLocalStorageSavedAt + saveTerm < current) {
-              localStorage.lists = JSON.stringify(this.lists)
-              this.lastLocalStorageSavedAt = current
-            }
           },
-          deep: true
-        }
-      },
-    })
-  </script>
-</body>
+          allReset() {
+            if (this.allResetCondition.status === allResetDefault.status) {
+              this.allResetCondition = allResetConfirm
+              setTimeout(() => {
+                this.allResetCondition = allResetDefault
+              }, 3000)
+            } else {
+              for (let i = 0; i < 15; i++) {
+                this.stopTimer(i)
+              }
+              this.lists = createEmptyTimer()
+              localStorage.lists = JSON.stringify(this.lists)
+              this.lastLocalStorageSavedAt = new Date().getTime()
+              this.allResetCondition = allResetDefault
+            }
+          }
+        },
+        watch: {
+          lists: {
+            handler(newValue, oldValue) {
+              const current = new Date().getTime()
+              if (this.lastLocalStorageSavedAt + saveTerm < current) {
+                localStorage.lists = JSON.stringify(this.lists)
+                this.lastLocalStorageSavedAt = current
+              }
+            },
+            deep: true
+          }
+        },
+      })
+    </script>
+  </body>
+
 </html>
