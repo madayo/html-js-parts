@@ -35,7 +35,12 @@
 
       <div class="flex flex-wrap justify-center gap-1">
         <div v-for="(list, index) in lists" class="flex-[1_1_500px] max-w-[600px] p-3">
-          <div class="flex flex-col rounded-md border border-gray-200 px-5 py-[0.55rem]">
+          <div :class="[
+            'flex flex-col rounded-md px-5 py-[0.55rem] transition-all duration-200',
+            list.status === 'running'
+              ? 'border-4 border-sky-500 bg-sky-50 shadow-lg'
+              : 'border border-gray-200 bg-white'
+          ]">
             <input type="text"
               class="mb-2 mr-3 block h-8 w-full rounded border border-gray-300 px-3 text-[0.85rem] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               v-model="list.name">
