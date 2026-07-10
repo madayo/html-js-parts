@@ -34,9 +34,9 @@
       </div>
 
       <div class="flex flex-wrap justify-center gap-1">
-        <div v-for="(list, index) in lists" class="flex-[1_1_500px] max-w-[600px] p-3">
+        <div v-for="(list, index) in lists" class="flex-[1_1_500px] max-w-[410px] p-2">
           <div :class="[
-            'flex flex-col rounded-md px-5 py-[0.55rem] transition-all duration-200',
+            'flex flex-col rounded-md p-2 transition-all duration-200',
             list.status === 'running'
               ? 'border-4 border-sky-500 bg-sky-50 shadow-lg'
               : 'border border-gray-200 bg-white'
@@ -47,25 +47,34 @@
 
             <div class="mt-2 flex items-center">
               <input type="text" readonly :class="[
-                'flex-1 h-8 max-w-[200px] rounded px-3 text-[0.85rem] focus:outline-none',
+                'flex-1 h-8 max-w-[170px] rounded px-3 text-[0.85rem] focus:outline-none',
                 list.status === 'running' ? 'border border-sky-400' : 'border border-gray-300',
                 list.accumulationMilliSeconds > 0 ? 'border-[3px] border-red-500' : ''
               ]" :value="formatMs(list.accumulationMilliSeconds)">
 
               <div class="ml-3 flex w-[220px] items-center justify-start">
                 <button :disabled="list.status === 'running'" @click="startTimer(index)"
-                  type="button"
-                  class="mx-2 flex h-8 w-20 items-center justify-center rounded bg-sky-500 text-xs text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
-                  Start
+                  type="button" aria-label="Start" title="Start"
+                  class="mx-2 flex h-7 w-7 items-center justify-center rounded bg-sky-500 text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5.14v13.72a1 1 0 0 0 1.51.86l10.29-6.86a1 1 0 0 0 0-1.72L9.51 4.28A1 1 0 0 0 8 5.14Z" />
+                  </svg>
                 </button>
                 <button @click="stopTimer(index)" :disabled="list.status === 'stopped'"
-                  type="button"
-                  class="mx-2 flex h-8 w-20 items-center justify-center rounded bg-sky-500 text-xs text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
-                  Stop
+                  type="button" aria-label="Stop" title="Stop"
+                  class="mx-2 flex h-7 w-7 items-center justify-center rounded bg-sky-500 text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <rect x="6" y="6" width="12" height="12" rx="1" />
+                  </svg>
                 </button>
                 <button @click="resetTimer(index)" type="button"
-                  class="mx-2 flex h-8 w-20 items-center justify-center rounded bg-red-600 text-xs text-white hover:bg-red-700">
-                  Reset
+                  aria-label="Reset" title="Reset"
+                  class="mx-2 flex h-7 w-7 items-center justify-center rounded bg-red-600 text-white hover:bg-red-700">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                    <path d="M3 3v5h5" />
+                  </svg>
                 </button>
               </div>
             </div>
