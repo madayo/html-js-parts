@@ -86,6 +86,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script>
+      const maxTimerCount = 20
+
       const initTimer = id => {
         return {
           id: id,
@@ -96,7 +98,7 @@
           accumulationMilliSeconds: 0,
         }
       }
-      const createEmptyTimer = id => new Array(15).fill('').map((v, i) => { return initTimer(i) })
+      const createEmptyTimer = () => new Array(maxTimerCount).fill('').map((v, i) => { return initTimer(i) })
 
       const allResetDefault = {
         status: 'default',
@@ -168,7 +170,7 @@
                 this.allResetCondition = allResetDefault
               }, 3000)
             } else {
-              for (let i = 0; i < 15; i++) {
+              for (let i = 0; i < maxTimerCount; i++) {
                 this.stopTimer(i)
               }
               this.lists = createEmptyTimer()
