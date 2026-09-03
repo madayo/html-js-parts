@@ -118,11 +118,21 @@
           lists: createEmptyTimer()
         },
         mounted() {
-          if (localStorage.lists) {
-            loadedLists = JSON.parse(localStorage.lists);
-            this.lists = loadedLists.map((v) => {
-              v.status = 'stopped'
-              return v
+          const savedLists = localStorage.lists ? JSON.parse(localStorage.lists) : []
+          this.lists = createEmptyTimer()
+
+          if (Array.isArray(savedLists) && savedLists.length > 0) {
+            this.lists = this.lists.map((list, index) => {
+              const saved = savedLists[index] || {}
+              return {
+                ...list,
+                ...saved,
+                id: index,
+                name: saved.name || '',
+                status: 'stopped',
+                runningAt: saved.runningAt || null,
+                accumulationMilliSeconds: Number(saved.accumulationMilliSeconds || 0),
+              }
             })
           }
         },
