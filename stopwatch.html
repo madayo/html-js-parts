@@ -20,6 +20,22 @@
           font-size: 0.9rem;
         }
       }
+
+      @keyframes running-border {
+
+        0%,
+        100% {
+          border-color: #22c55e;
+        }
+
+        50% {
+          border-color: #e5e7eb;
+        }
+      }
+
+      .running-border {
+        animation: running-border 2s ease-in-out infinite;
+      }
     </style>
   </head>
 
@@ -34,44 +50,44 @@
       </div>
 
       <div class="flex flex-wrap justify-center gap-1">
-        <div v-for="(list, index) in lists" class="flex-[1_1_500px] max-w-[410px] p-2">
+        <div v-for="(list, index) in lists" class="p-1">
           <div :class="[
-            'flex flex-col rounded-md p-2 transition-all duration-200',
-            list.status === 'running'
-              ? 'border-4 border-sky-500 bg-sky-50 shadow-lg'
-              : 'border border-gray-200 bg-white'
-          ]">
+            'flex flex-col gap-2 rounded-md border-[2.5px] bg-white p-2',
+            list.status === 'running' ? 'running-border' : 'border-gray-200 transition-colors duration-200'
+          ]" :style="list.status === 'running' ? { animationDelay: list.blinkDelay } : {}">
             <input type="text"
-              class="mb-2 mr-3 block h-8 w-full rounded border border-gray-300 px-3 text-[0.85rem] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              class="block h-5 w-full rounded border border-gray-300 px-3 text-[0.55rem] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               v-model="list.name">
 
-            <div class="mt-2 flex items-center">
+            <div class="flex flex-wrap items-center gap-2">
               <input type="text" readonly :class="[
-                'flex-1 h-8 max-w-[170px] rounded px-3 text-[0.85rem] focus:outline-none',
-                list.status === 'running' ? 'border border-sky-400' : 'border border-gray-300',
-                list.accumulationMilliSeconds > 0 ? 'border-[3px] border-red-500' : ''
+                'h-4 w-[75px] shrink-0 rounded border border-gray-300 text-center text-[0.55rem] outline-none',
+                list.accumulationMilliSeconds > 0 ? 'bg-green-50 text-green-600' : 'bg-white'
               ]" :value="formatMs(list.accumulationMilliSeconds)">
 
-              <div class="ml-3 flex w-[220px] items-center justify-start">
-                <button :disabled="list.status === 'running'" @click="startTimer(index)"
-                  type="button" aria-label="Start" title="Start"
-                  class="mx-2 flex h-7 w-7 items-center justify-center rounded bg-sky-500 text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M8 5.14v13.72a1 1 0 0 0 1.51.86l10.29-6.86a1 1 0 0 0 0-1.72L9.51 4.28A1 1 0 0 0 8 5.14Z" />
-                  </svg>
-                </button>
-                <button @click="stopTimer(index)" :disabled="list.status === 'stopped'"
-                  type="button" aria-label="Pause" title="Pause"
-                  class="mx-2 flex h-7 w-7 items-center justify-center rounded bg-sky-500 text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <div class="flex gap-2 items-center justify-start">
+                <button @click="toggleTimer(index)" type="button"
+                  :aria-label="list.status === 'running' ? 'Pause' : 'Start'"
+                  :title="list.status === 'running' ? 'Pause' : 'Start'" :class="[
+                    'flex h-4 w-8 items-center justify-center rounded text-white',
+                    list.status === 'running' ? 'bg-gray-700 hover:bg-gray-800' : 'bg-sky-500 hover:bg-sky-600'
+                  ]">
+                  <svg v-if="list.status === 'running'" class="h-2 w-2" viewBox="0 0 24 24" fill="currentColor"
+                    aria-hidden="true">
                     <rect x="6" y="5" width="4" height="14" rx="1" />
                     <rect x="14" y="5" width="4" height="14" rx="1" />
                   </svg>
+                  <svg v-else class="h-2 w-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5.14v13.72a1 1 0 0 0 1.51.86l10.29-6.86a1 1 0 0 0 0-1.72L9.51 4.28A1 1 0 0 0 8 5.14Z" />
+                  </svg>
                 </button>
                 <button @click="resetTimer(index)" type="button"
-                  aria-label="Reset" title="Reset"
-                  class="mx-2 flex h-7 w-7 items-center justify-center rounded bg-red-600 text-white hover:bg-red-700">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  :aria-label="list.resetConfirming ? 'Are you sure?' : 'Reset'"
+                  :title="list.resetConfirming ? 'Are you sure?' : 'Reset'" :class="[
+                    'flex h-4 w-4 items-center justify-center rounded text-white',
+                    list.resetConfirming ? 'bg-orange-500 hover:bg-orange-600' : 'bg-red-600 hover:bg-red-700'
+                  ]">
+                  <svg class="h-2 w-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
                     <path d="M3 3v5h5" />
@@ -87,6 +103,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script>
       const maxTimerCount = 20
+      const runningBorderDurationMs = 2000
 
       const initTimer = id => {
         return {
@@ -96,6 +113,9 @@
           status: 'stopped',
           runningAt: null,
           accumulationMilliSeconds: 0,
+          blinkDelay: '0ms',
+          resetConfirming: false,
+          resetConfirmTimer: null,
         }
       }
       const createEmptyTimer = () => new Array(maxTimerCount).fill('').map((v, i) => { return initTimer(i) })
@@ -132,6 +152,8 @@
                 status: 'stopped',
                 runningAt: saved.runningAt || null,
                 accumulationMilliSeconds: Number(saved.accumulationMilliSeconds || 0),
+                resetConfirming: false,
+                resetConfirmTimer: null,
               }
             })
           }
@@ -140,15 +162,24 @@
           formatMs(_ms) {
             const hour = Math.floor(_ms / 3600000)
             const minute = Math.floor((_ms - 3600000 * hour) / 60000)
+            const second = Math.floor((_ms - 3600000 * hour - 60000 * minute) / 1000)
             const hh = ('00' + hour).slice(-2)
             const mm = ('00' + minute).slice(-2)
-            const ms = ('00000' + (_ms % 60000)).slice(-5)
-            return `${hh} : ${mm} : ${ms.slice(0, 2)}.${ms.slice(2, 5)} `
+            const ss = ('00' + second).slice(-2)
+            return `${hh} : ${mm} : ${ss} `
+          },
+          toggleTimer(id) {
+            if (this.lists[id].status === 'running') {
+              this.stopTimer(id)
+            } else {
+              this.startTimer(id)
+            }
           },
           startTimer(id) {
             if (this.lists[id].status === 'stopped') {
               this.lists[id].status = 'running'
               this.lists[id].runningAt = Date.now()
+              this.lists[id].blinkDelay = `-${Date.now() % runningBorderDurationMs}ms`
               this.lists[id].timer = setInterval(() => {
                 this.lists[id].accumulationMilliSeconds += (Date.now() - this.lists[id].runningAt)
                 this.lists[id].runningAt = Date.now()
@@ -164,6 +195,18 @@
             }
           },
           resetTimer(id) {
+            if (!this.lists[id].resetConfirming) {
+              this.lists[id].resetConfirming = true
+              this.lists[id].resetConfirmTimer = setTimeout(() => {
+                this.lists[id].resetConfirming = false
+              }, 3000)
+              return
+            }
+
+            clearTimeout(this.lists[id].resetConfirmTimer)
+            this.lists[id].resetConfirmTimer = null
+            this.lists[id].resetConfirming = false
+
             clearInterval(this.lists[id].timer)
             this.lists[id].timer = null
             this.lists[id].status = 'stopped'
