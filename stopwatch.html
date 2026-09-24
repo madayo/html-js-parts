@@ -52,18 +52,18 @@
       <div class="flex flex-wrap justify-center gap-1">
         <div v-for="(list, index) in lists" class="p-1">
           <div :class="[
-            'flex flex-col gap-2 rounded-md border-[2.5px] bg-white p-2',
+            'flex flex-col gap-2 rounded-md border-[2.5px] p-2',
+            list.accumulationMilliSeconds > 0 ? 'bg-green-100' : 'bg-white',
             list.status === 'running' ? 'running-border' : 'border-gray-200 transition-colors duration-200'
           ]" :style="list.status === 'running' ? { animationDelay: list.blinkDelay } : {}">
             <input type="text"
-              class="block h-5 w-full rounded border border-gray-300 px-3 text-[0.55rem] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              class="block h-5 w-full rounded border border-gray-300 px-2 text-[0.55rem] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               v-model="list.name">
 
             <div class="flex flex-wrap items-center gap-2">
-              <input type="text" readonly :class="[
-                'h-4 w-[75px] shrink-0 rounded border border-gray-300 text-center text-[0.55rem] outline-none',
-                list.accumulationMilliSeconds > 0 ? 'bg-green-50 text-green-600' : 'bg-white'
-              ]" :value="formatMs(list.accumulationMilliSeconds)">
+              <input type="text" readonly
+                class="h-4 w-[75px] shrink-0 rounded border border-gray-300 bg-white text-center text-[0.55rem] outline-none"
+                :value="formatMs(list.accumulationMilliSeconds)">
 
               <div class="flex gap-2 items-center justify-start">
                 <button @click="toggleTimer(index)" type="button"
